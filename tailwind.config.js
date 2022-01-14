@@ -1,6 +1,5 @@
 module.exports = {
-  purge: ['./src/**/*.tsx'],
-  darkMode: false, // or 'media' or 'class'
+  content: ['./packages/renderer/index.html', './packages/renderer/src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
