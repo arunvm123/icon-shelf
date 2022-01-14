@@ -17,21 +17,27 @@ jobs:
           token: ${{ secrets.GH_PAT }}
 
       - name: Install Node and NPM
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 16
+          cache: 'npm'
+
+      - name: Cache dependencies
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: ./node_modules
+          key: npm-full-modules-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
-        run: |
-          yarn install
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm install --no-save
 
       - name: Bump version
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          cd src && npm version patch
-          git add .
-          git commit -m "bump package version"
+          npm version patch -m "bump package version"
           git push
 
       - name: Publish releases
@@ -44,5 +50,4 @@ jobs:
           # This is used for uploading release assets to github
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          npm run postinstall
           npm run publish
